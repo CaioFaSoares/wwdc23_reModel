@@ -6,7 +6,7 @@ struct MainMenuView: View {
 	
     var body: some View {
 		if showNextView {
-			firstPaintingRepresentable()
+			firstPaitingView()
 				.ignoresSafeArea()
 		} else {
 			VStack {
