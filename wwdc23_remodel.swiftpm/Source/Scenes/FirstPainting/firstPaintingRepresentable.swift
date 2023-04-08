@@ -9,14 +9,15 @@ import Foundation
 import SwiftUI
 
 struct firstPaintingRepresentable: UIViewControllerRepresentable {
+	@Binding var obs: firstPaintingObservable
 	
 	func makeUIViewController(context: Context) -> firstPaintingController {
-		let vc = firstPaintingController()
-		return vc
+		let viewController = firstPaintingController(observable: obs)
+		return viewController
 	}
 	
 	func updateUIViewController(_ uiViewController: firstPaintingController, context: Context) {
-		
+		uiViewController.observable = obs
 	}
 	
 	typealias UIViewControllerType = firstPaintingController
