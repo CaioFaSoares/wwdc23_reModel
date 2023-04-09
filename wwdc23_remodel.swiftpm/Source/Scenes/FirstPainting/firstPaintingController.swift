@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 class firstPaintingController: UIViewController {
 	
@@ -19,6 +20,10 @@ class firstPaintingController: UIViewController {
 		bg.backgroundColor = .systemBrown
 		return bg
 	}()
+	
+//	private var firstStrokeSVG: UIHostingController {
+//		let view = UIHostingController(rootView: SVGHostView(svgFileName: <#Binding<String>#>, svgColor: <#Binding<Color>#>))
+//	}
 	
 	internal init(bgc: UIColor? = nil, firstStrokeRecognizer: fp1stGestureRecognizer? = nil) {
 		self.bgc = bgc
