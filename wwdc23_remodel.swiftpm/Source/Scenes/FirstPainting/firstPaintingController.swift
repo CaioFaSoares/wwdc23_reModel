@@ -10,7 +10,7 @@ import UIKit
 
 class firstPaintingController: UIViewController {
 	
-	var observable: firstPaintingObservable
+	var bgc: UIColor!
 	var firstStrokeRecognizer: fp1stGestureRecognizer!
 	
 	private let canvasView: UIView = {
@@ -20,18 +20,18 @@ class firstPaintingController: UIViewController {
 		return bg
 	}()
 	
-	override func viewDidLoad() {
-		setupView()
-	}
-	
-	init(observable: firstPaintingObservable, firstStrokeRecognizer: fp1stGestureRecognizer? = nil) {
-		self.observable = observable
+	internal init(bgc: UIColor? = nil, firstStrokeRecognizer: fp1stGestureRecognizer? = nil) {
+		self.bgc = bgc
 		self.firstStrokeRecognizer = firstStrokeRecognizer
 		super.init(nibName: nil, bundle: nil)
 	}
-
+	
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
+	}
+	
+	override func viewDidLoad() {
+		setupView()
 	}
 	
 }
@@ -44,14 +44,19 @@ extension firstPaintingController {
 	  }
 	}
 	
+	func updateBackgroundColor() {
+		view.backgroundColor = bgc
+	}
+	
 }
 
 extension firstPaintingController: ViewCoding {
 	
 	func setupView() {
 		firstStrokeRecognizer = fp1stGestureRecognizer(target: self, action: #selector(circled))
-		view.isUserInteractionEnabled = true
+		view.isUserInteractionEnabled = false
 		view.addGestureRecognizer(firstStrokeRecognizer)
+		view.backgroundColor = bgc
 	}
 	
 	func setupHierarchy() {

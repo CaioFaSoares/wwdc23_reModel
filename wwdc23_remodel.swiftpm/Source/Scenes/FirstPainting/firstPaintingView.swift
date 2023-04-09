@@ -8,26 +8,18 @@
 import Foundation
 import SwiftUI
 
-class firstPaintingObservable: ObservableObject {
-	@Published var backgroundColor: UIColor = .systemRed
-	var changeColorToMint: (() -> Void)!
-}
-
 struct firstPaitingView: View {
 	
-	@State var showNextView: Bool = false
-	@State var obs = firstPaintingObservable()
+	@State var changingBackgroundColor: UIColor = .systemPink
 	
 	var body: some View {
 		ZStack {
-			firstPaintingRepresentable(obs: $obs)
+			firstPaintingRepresentable(backgroundColor: $changingBackgroundColor)
+				.ignoresSafeArea()
 			VStack {
 				Text("teste!")
-				Button("test button") {
-					obs.backgroundColor = .systemMint
-				}
 				Button("what's the view?") {
-					print(obs.backgroundColor)
+					changingBackgroundColor = .systemMint
 				}
 			}
 			.hiddenNavigationBarStyle()
