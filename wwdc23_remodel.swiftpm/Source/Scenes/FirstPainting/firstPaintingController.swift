@@ -59,7 +59,7 @@ extension firstPaintingController: ViewCoding {
 	
 	func setupView() {
 		firstStrokeRecognizer = fp1stGestureRecognizer(target: self, action: #selector(circled))
-		view.isUserInteractionEnabled = false
+		view.isUserInteractionEnabled = true
 		view.addGestureRecognizer(firstStrokeRecognizer)
 		view.backgroundColor = bgc
 	}

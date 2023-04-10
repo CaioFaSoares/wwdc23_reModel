@@ -63,9 +63,9 @@ class fp1stGestureRecognizer: UIGestureRecognizer {
 				print("First stroke executed!")
 				print(newPoint)
 			} else {
-				self.state = .failed
-				print("Oops, you missed the first stroke...")
-				print(newPoint)
+//				self.state = .failed
+//				print("Oops, you missed the first stroke...")
+//				print(newPoint)
 			}
 		} else if self.strokePhase == .fstStroke {
 			if newPoint.x >= previousPoint.x && newPoint.y <= previousPoint.y {
@@ -74,8 +74,8 @@ class fp1stGestureRecognizer: UIGestureRecognizer {
 				print(newPoint)
 			} else {
 				self.state = .failed
-				print("Oops, you missed the second stroke...")
-				print(newPoint)
+//				print("Oops, you missed the second stroke...")
+//				print(newPoint)
 			}
 			
 		}
