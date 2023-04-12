@@ -57,8 +57,7 @@ class fp1stGestureRecognizer: UIGestureRecognizer {
 		let previousPoint 	= (newTouch?.previousLocation(in: self.view))!
 		
 		if self.strokePhase == .initialPoint {
-			if newPoint.x <= initialTouchPoint.x &&
-				newPoint.y <= initialTouchPoint.y {
+			if initialTouchPoint.x > newPoint.x && initialTouchPoint.y < newPoint.y {
 				self.strokePhase = .fstStroke
 				print("First stroke executed!")
 				print(newPoint)
@@ -68,12 +67,12 @@ class fp1stGestureRecognizer: UIGestureRecognizer {
 //				print(newPoint)
 			}
 		} else if self.strokePhase == .fstStroke {
-			if newPoint.x >= previousPoint.x && newPoint.y <= previousPoint.y {
+			if previousPoint.x < newPoint.x && previousPoint.y < newPoint.y {
 				self.strokePhase = .sndStroke
 				print("Second stroke executed!")
 				print(newPoint)
 			} else {
-				self.state = .failed
+//				self.state = .failed
 //				print("Oops, you missed the second stroke...")
 //				print(newPoint)
 			}

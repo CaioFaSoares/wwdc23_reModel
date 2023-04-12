@@ -15,7 +15,6 @@ struct MainMenuView: View {
 				}
 					.buttonStyle(.automatic)
 					.padding(.all)
-				
 				NavigationLink(destination: firstPaitingView(), isActive: $showNextView) { EmptyView() }
 				Spacer()
 				HStack{
