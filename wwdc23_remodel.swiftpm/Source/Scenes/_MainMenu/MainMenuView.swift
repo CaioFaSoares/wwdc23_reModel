@@ -13,7 +13,7 @@ struct MainMenuView: View {
 				Button ("Start") {
 					showNextView.toggle()
 				}
-					.buttonStyle(.automatic)
+					.buttonStyle(.bordered)
 					.padding(.all)
 				NavigationLink(destination: firstPaitingView(), isActive: $showNextView) { EmptyView() }
 				Spacer()

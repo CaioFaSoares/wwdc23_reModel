@@ -9,21 +9,55 @@ import Foundation
 import UIKit
 import SwiftUI
 
+
+
 class firstPaintingController: UIViewController {
 	
-	var bgc: UIColor!
-	var firstStrokeRecognizer: fp1stGestureRecognizer!
+	var firstStrokeRecognizer: lessThan_gesture!
+	var secondStrokeRecognizer: moreThan_Gesture!
+	var thirdStrokeRecognizer: vertLine_Gesture!
+	var finishingStrokeRecognizer: horiLine_Gesture!
+	
+	@ObservedObject var coordinator: conversationsCoordinator
+	
+	var svgs: String = "p1b1"
+	
+	
 	
 	private let canvasView: UIView = {
 		var bg = UIView()
 		bg.frame = .zero
 		bg.translatesAutoresizingMaskIntoConstraints = false
-		bg.backgroundColor = .systemBrown
+		bg.backgroundColor = .clear
 		return bg
 	}()
 	
-	private var firstStrokeSVG: UIHostingController<SVGHostView> = {
-		let view = UIHostingController(rootView: SVGHostView(svgFileName: "p1b1", svgColor: ".blue"))
+	lazy private var firstStrokeSVG: UIHostingController<SVGHostView> = {
+		let view = UIHostingController(rootView: SVGHostView(svgFileName: svgs, index: 0))
+		view.view.translatesAutoresizingMaskIntoConstraints = false
+		view.view.frame = .zero
+		view.view.alpha = 0
+		return view
+	}()
+	
+	lazy private var secondStrokeSVG: UIHostingController<SVGHostView> = {
+		let view = UIHostingController(rootView: SVGHostView(svgFileName: svgs, index: 1))
+		view.view.translatesAutoresizingMaskIntoConstraints = false
+		view.view.frame = .zero
+		view.view.alpha = 0
+		return view
+	}()
+	
+	lazy private var thirdStrokeSVG: UIHostingController<SVGHostView> = {
+		let view = UIHostingController(rootView: SVGHostView(svgFileName: svgs, index: 2))
+		view.view.translatesAutoresizingMaskIntoConstraints = false
+		view.view.frame = .zero
+		view.view.alpha = 0
+		return view
+	}()
+	
+	lazy private var forthStrokeSVG: UIHostingController<SVGHostView> = {
+		let view = UIHostingController(rootView: SVGHostView(svgFileName: svgs, index: 3))
 		view.view.translatesAutoresizingMaskIntoConstraints = false
 		view.view.frame = .zero
 		view.view.alpha = 0
@@ -37,9 +71,8 @@ class firstPaintingController: UIViewController {
 		return label
 	}()
 	
-	internal init(bgc: UIColor? = nil, firstStrokeRecognizer: fp1stGestureRecognizer? = nil) {
-		self.bgc = bgc
-		self.firstStrokeRecognizer = firstStrokeRecognizer
+	init(coordinator: conversationsCoordinator) {
+		self.coordinator = coordinator
 		super.init(nibName: nil, bundle: nil)
 	}
 	
@@ -55,14 +88,51 @@ class firstPaintingController: UIViewController {
 
 extension firstPaintingController {
 	
-	@objc func circled(_ c: UIGestureRecognizer) {
+	@objc func firstStrokeFunction(_ c: UIGestureRecognizer) {
 		if c.state == .ended {
-			canvasView.backgroundColor = .systemPink
+			canvasView.removeGestureRecognizer(firstStrokeRecognizer)
+			canvasView.addGestureRecognizer(secondStrokeRecognizer)
+			
+			firstStrokeSVG.view.alpha = 1
+			coordinator.afterPaintingPrepareNextDialogue()
+			setupFirstStroke()
 	  }
 	}
 	
-	func updateBackgroundColor() {
-		view.backgroundColor = bgc
+	@objc func secondStrokeFunction(_ c: UIGestureRecognizer) {
+		if c.state == .ended {
+			canvasView.removeGestureRecognizer(secondStrokeRecognizer)
+			canvasView.addGestureRecognizer(thirdStrokeRecognizer)
+	  }
+	}
+	
+	@objc func thirdStrokeFunction(_ c: UIGestureRecognizer) {
+		if c.state == .ended {
+			canvasView.backgroundColor = .systemMint
+			canvasView.removeGestureRecognizer(thirdStrokeRecognizer)
+			canvasView.addGestureRecognizer(finishingStrokeRecognizer)
+	  }
+	}
+	
+	@objc func finishingStrokeFunction(_ c: UIGestureRecognizer) {
+		if c.state == .ended {
+			canvasView.backgroundColor = .systemIndigo
+			canvasView.removeGestureRecognizer(finishingStrokeRecognizer)
+	  }
+	}
+	
+//	func updateBackgroundColor() {
+//		self.bgc = bgc
+//	}
+	
+}
+
+extension firstPaintingController {
+	
+	func setupViewAccordinglyToStroke(index: Int){
+		if index == 1{
+			coordinator.afterPaintingPrepareNextDialogue()
+		}
 	}
 	
 }
@@ -70,15 +140,20 @@ extension firstPaintingController {
 extension firstPaintingController: ViewCoding {
 	
 	func setupView() {
-		firstStrokeRecognizer = fp1stGestureRecognizer(target: self, action: #selector(circled))
+		firstStrokeRecognizer = lessThan_gesture(target: self, action: #selector(firstStrokeFunction))
+		secondStrokeRecognizer = moreThan_Gesture(target: self, action: #selector(secondStrokeFunction))
+		thirdStrokeRecognizer = vertLine_Gesture(target: self, action: #selector(thirdStrokeFunction))
+		finishingStrokeRecognizer = horiLine_Gesture(target: self, action: #selector(finishingStrokeFunction))
+		
+		canvasView.addGestureRecognizer(firstStrokeRecognizer)
+		canvasView.isUserInteractionEnabled = true
+		
 		view.isUserInteractionEnabled = true
-		view.addGestureRecognizer(firstStrokeRecognizer)
 		view.backgroundColor = .clear
 	}
 	
 	func setupHierarchy() {
 		view.addSubview(self.canvasView)
-		view.addSubview(self.firstStrokeSVG.view)
 	}
 	
 	func setupConstraints() {
@@ -88,10 +163,16 @@ extension firstPaintingController: ViewCoding {
 			canvasView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
 			canvasView.heightAnchor.constraint(equalTo: view.heightAnchor),
 			canvasView.widthAnchor.constraint(equalTo: view.widthAnchor),
-			
-			firstStrokeSVG.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			firstStrokeSVG.view.topAnchor.constraint(equalTo: view.topAnchor),
-			firstStrokeSVG.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+		])
+	}
+	
+	func setupFirstStroke() {
+		
+		canvasView.addSubview(self.firstStrokeSVG.view)
+		
+		NSLayoutConstraint.activate([
+			firstStrokeSVG.view.heightAnchor.constraint(equalTo: view.heightAnchor),
+			firstStrokeSVG.view.widthAnchor.constraint(equalTo: view.widthAnchor),
 		])
 	}
 	

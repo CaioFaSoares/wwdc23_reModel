@@ -10,12 +10,18 @@ import SwiftUI
 struct SVGHostView: View {
 	
 	var svgFileName: String
-	var svgColor: String
+	var index: Int
+	
+//	@ObservedObject var strokeColors: strokeColors
 	
     var body: some View {
-        Image(svgFileName)
-			.ignoresSafeArea()
-			.foregroundColor(.black)
+		ZStack {
+			Image(svgFileName)
+				.ignoresSafeArea()
+			Color("testPurple")
+				.blendMode(.colorDodge)
+			
+		}
     }
 }
 

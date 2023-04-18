@@ -10,31 +10,33 @@ import SwiftUI
 
 struct firstPaitingView: View {
 	
-	@State var changingBackgroundColor: UIColor = .systemPink
-	@State var conversationIndex: Int = 0
-	@State var chatBlocked: Bool = false
-	@State var choiceOffered: Bool = false
+	@ObservedObject var coordinator = conversationsCoordinator()
 	
 	var body: some View {
 		ZStack {
-			firstPaintingRepresentable(backgroundColor: $changingBackgroundColor)
+			firstPaintingRepresentable(coordinator: coordinator)
 				.ignoresSafeArea()
+				.disabled(coordinator.isCanvasBlocked)
 			VStack {
 				Spacer()
 				ZStack {
 					Color(.black)
 						.opacity(0.25)
 						.padding(.all)
+						.cornerRadius(CGFloat.pi)
 					VStack {
-						ChatFactory(conversationIndex: $conversationIndex)
+						ChatFactory(coordinator: coordinator)
 						Spacer()
 						HStack {
 							Spacer()
-							ChatButton(chatBlocked: $chatBlocked, conversationIndex: $conversationIndex, choiceOffered: $choiceOffered)
+							ReverseChatButton(coordinator: coordinator)
+							Text("\(coordinator.conversationIndex + 1) | \(coordinator.currentChat.count)")
+							ChatButton(coordinator: coordinator)
+							Spacer()
 						}
 					}
 					.padding(.all)
-				}.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height/3)
+				}.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height/4)
 			}
 			.hiddenNavigationBarStyle()
 		}
@@ -43,17 +45,16 @@ struct firstPaitingView: View {
 
 struct ChatButton: View {
 	
-	@Binding var chatBlocked: Bool
-	@Binding var conversationIndex: Int
-	@Binding var choiceOffered: Bool
+	@ObservedObject var coordinator: conversationsCoordinator
 	
 	var body: some View {
-		if chatBlocked == false {
+		if coordinator.isForwardBlocked == false && coordinator.currentGameState != .painting {
 			Button {
-				if conversationIndex != chat1.count - 1 {
-					conversationIndex += 1
-					if conversationIndex == chat1.count - 1 {
-						chatBlocked = true
+				if coordinator.conversationIndex != coordinator.currentChat.count - 1 {
+					coordinator.conversationIndex += 1
+					coordinator.isBackwardBlocked = false
+					if coordinator.conversationIndex == coordinator.currentChat.count - 1 {
+						coordinator.isForwardBlocked = true
 					}
 				}
 			} label: {
@@ -75,29 +76,105 @@ struct ChatButton: View {
 	}
 }
 
+struct ReverseChatButton: View {
+	
+	@ObservedObject var coordinator: conversationsCoordinator
+	
+	var body: some View {
+		if coordinator.isBackwardBlocked == false && coordinator.currentGameState != .painting {
+			Button {
+				if coordinator.conversationIndex != 0 {
+					coordinator.conversationIndex -= 1
+					if coordinator.conversationIndex == 0 {
+						coordinator.isBackwardBlocked = true
+					}
+				}
+			} label: {
+				Image(systemName: "arrowshape.left.fill")
+					.font(.title)
+					.foregroundColor(.black)
+			}
+			.padding(.all)
+		} else {
+			Button {
+				
+			} label: {
+			Image(systemName: "arrowshape.left")
+				.font(.title)
+				.foregroundColor(.black)
+			}
+			.padding(.all)
+		}
+	}
+}
+
 struct ChatFactory: View {
 	
-	@Binding var conversationIndex: Int
+	@ObservedObject var coordinator: conversationsCoordinator
+	
 	var body: some View {
 		VStack {
-			HStack {
-				Text(chat1[conversationIndex].1)
+			switch coordinator.currentChat[coordinator.conversationIndex].2 {
+			case .normalChat:
+				HStack {
+					Text(coordinator.currentChat[coordinator.conversationIndex].1)
+						.font(.title)
+						.foregroundColor(.black)
+						.padding(.all)
+						.italic()
+						.bold()
+					Spacer()
+				}
+				HStack {
+					Text(coordinator.currentChat[coordinator.conversationIndex].0)
+						.font(.title2)
+						.foregroundColor(.black)
+						.padding(.horizontal)
+						.multilineTextAlignment(.leading)
+					Spacer()
+				}
+			case .question:
+				HStack {
+					Button("\(coordinator.currentChat[coordinator.conversationIndex].0)") {
+						coordinator.afterChattingHasEndedProcessAnswer(choice: .answerTA, currentPhase: coordinator.currentPhase)
+					}	.buttonStyle(.bordered)
+						.font(.title)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.black)
+						.tint(.orange)
+						.padding(.all)
+					Button("\(coordinator.currentChat[coordinator.conversationIndex].1)") {
+						coordinator.afterChattingHasEndedProcessAnswer(choice: .answerTB, currentPhase: coordinator.currentPhase)
+					}	.buttonStyle(.bordered)
+						.multilineTextAlignment(.center)
+						.font(.title)
+						.foregroundColor(.black)
+						.tint(.blue)
+						.padding(.all)
+				}.frame(alignment: .top)
+			case .emptyChat:
+				Text("...")
 					.font(.title)
 					.foregroundColor(.black)
 					.padding(.all)
-					.italic()
-					.bold()
-				Spacer()
-			}
-			HStack {
-				Text(chat1[conversationIndex].0)
-					.font(.title2)
-					.foregroundColor(.black)
-					.padding(.horizontal)
-					.multilineTextAlignment(.leading)
-				Spacer()
+			case .promptToDraw:
+				VStack {
+					Text(coordinator.currentChat[coordinator.conversationIndex].0)
+						.font(.title)
+						.foregroundColor(.black)
+						.padding(.all)
+					Button(coordinator.currentChat[coordinator.conversationIndex].1) {
+						
+					}	.buttonStyle(.bordered)
+						.multilineTextAlignment(.center)
+						.font(.title)
+						.foregroundColor(.black)
+						.tint(.blue)
+						.padding(.all)
+				}.task {
+					coordinator.afterAnsweringHasEndedPrepareStroke()
+				}
 			}
 		}
 	}
-	
-}
+ }

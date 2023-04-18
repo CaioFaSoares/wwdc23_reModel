@@ -1,24 +1,9 @@
-//
-//  File.swift
-//  
-//
-//  Created by Caio Soares on 04/04/23.
-//
-
 import UIKit
 import UIKit.UIGestureRecognizerSubclass
 
-enum firstStrokePhases {
-	case notStarted
-	case initialPoint
-	case fstStroke
-	case sndStroke
-	case completed
-}
-
-class fp1stGestureRecognizer: UIGestureRecognizer {
+class moreThan_Gesture: UIGestureRecognizer {
 	
-	var strokePhase			:firstStrokePhases = .notStarted
+	var strokePhase			:strokePhase = .notStarted
 	var initialTouchPoint	:CGPoint = CGPoint.zero
 	var trackedTouch		:UITouch? = nil
 	
@@ -57,20 +42,18 @@ class fp1stGestureRecognizer: UIGestureRecognizer {
 		let previousPoint 	= (newTouch?.previousLocation(in: self.view))!
 		
 		if self.strokePhase == .initialPoint {
-			if initialTouchPoint.x > newPoint.x && initialTouchPoint.y < newPoint.y {
+			if initialTouchPoint.x < newPoint.x && initialTouchPoint.y < newPoint.y {
 				self.strokePhase = .fstStroke
-				print("First stroke executed!")
-				print(newPoint)
+				print("\(strokePhase) ok @ \(type(of: self))")
 			} else {
 //				self.state = .failed
 //				print("Oops, you missed the first stroke...")
 //				print(newPoint)
 			}
 		} else if self.strokePhase == .fstStroke {
-			if previousPoint.x < newPoint.x && previousPoint.y < newPoint.y {
+			if previousPoint.x > newPoint.x && previousPoint.y < newPoint.y {
 				self.strokePhase = .sndStroke
-				print("Second stroke executed!")
-				print(newPoint)
+				print("\(strokePhase) ok @ \(type(of: self))")
 			} else {
 //				self.state = .failed
 //				print("Oops, you missed the second stroke...")

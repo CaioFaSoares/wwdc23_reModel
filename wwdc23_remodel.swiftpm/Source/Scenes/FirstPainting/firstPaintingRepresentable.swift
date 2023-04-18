@@ -10,16 +10,16 @@ import SwiftUI
 
 struct firstPaintingRepresentable: UIViewControllerRepresentable {
 	
-	@Binding var backgroundColor: UIColor
+	@ObservedObject var coordinator: conversationsCoordinator
 	
 	func makeUIViewController(context: Context) -> firstPaintingController {
-		let viewController = firstPaintingController(bgc: backgroundColor)
+		let viewController = firstPaintingController(coordinator: coordinator)
 		return viewController
 	}
 	
 	func updateUIViewController(_ uiViewController: firstPaintingController, context: Context) {
-		uiViewController.bgc = backgroundColor
-		uiViewController.updateBackgroundColor()
+		uiViewController.coordinator = coordinator
+//		uiViewController.updateBackgroundColor()
 	}
 	
 	typealias UIViewControllerType = firstPaintingController
